@@ -1,0 +1,29 @@
+{
+  "name": "apv-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Aprendiendo JS Fullstack",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZunoRick/APV-Backend-JSModerno.git"
+  },
+  "author": "Ricardo Zuno",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ZunoRick/APV-Backend-JSModerno/issues"
+  },
+  "homepage": "https://github.com/ZunoRick/APV-Backend-JSModerno#readme",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "mongoose": "^6.2.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
