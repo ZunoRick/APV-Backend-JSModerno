@@ -70,7 +70,12 @@ const autenticar = async (req, res) =>{
   //Revisar el password
   if (await usuario.comprobarPassword(password)) {
     //Autenticar
-    res.json({ token: generarJWT(usuario.id) });
+    res.json({
+      _id: usuario._id,
+      nombre: usuario.nombre,
+      email: usuario.email,
+      token: generarJWT(usuario.id),
+    });
   }else{
     const error = new Error('Password Incorrecto');
     return res.status(403).json({ msg: error.message });
@@ -145,12 +150,63 @@ const nuevoPassword = async (req, res) =>{
 const perfil = (req, res) => {
   const { veterinario } = req;
 
-  res.json({ perfil: veterinario });
-
-  res.json({
-    msg: 'Mostrando perfil'
-  })
+  res.json(veterinario);
 };
+
+const actualizarPerfil = async (req, res) =>{
+  const veterinario = await Veterinario.findById(req.params.id);
+  const { email } = req.body;
+
+  if (!veterinario) {
+    const error = new Error('Hubo un error');
+    return res.status(400).json({ msg: error.message });
+  }
+
+  if (veterinario.email !== req.body.email) {
+    const existeEmail = await Veterinario.findOne({email});
+    if (existeEmail) {
+      const error = new Error('Email ya registrado');
+      return res.status(400).json({ msg: error.message });
+    }
+  }
+
+  try {
+    veterinario.nombre = req.body.nombre;
+    veterinario.email = req.body.email;
+    veterinario.web = req.body.web;
+    veterinario.telefono = req.body.telefono;
+
+    const veterinarioActualizado = await veterinario.save();
+    res.json(veterinarioActualizado);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const actualiarPassword = async (req, res) =>{
+  //Leer los datos
+  const { id } = req.veterinario;
+  const { passwordActual, nuevoPassword } = req.body;
+
+  //Comprobar que el veterinario existe
+  const veterinario = await Veterinario.findById(id);
+
+  if (!veterinario) {
+    const error = new Error('Hubo un error');
+    return res.status(400).json({ msg: error.message });
+  }
+
+  //Comprobar su password
+  if (await veterinario.comprobarPassword(passwordActual)) {
+    //almacenar el nuevo password
+    veterinario.password = nuevoPassword;
+    await veterinario.save();
+    res.json({ msg: 'Password Guardado Correctamente' });
+  }else{
+    const error = new Error('El Password Actual es Incorrecto');
+    return res.status(400).json({ msg: error.message });
+  }
+}
 
 export{
   registrar,
@@ -159,5 +215,7 @@ export{
   olvidePassword,
   comprobarToken,
   nuevoPassword,
-  perfil
+  perfil,
+  actualizarPerfil,
+  actualiarPassword
 }
